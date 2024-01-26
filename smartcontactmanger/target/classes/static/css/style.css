@@ -1,0 +1,97 @@
+.navbar{
+	background-color:cadetblue;
+}
+.collapse{
+	justify-content: end;
+}
+
+.home-page{
+	background-image:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)) ,url(../img/bgimg.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	height: 93vh;
+	width: 100%;
+}
+
+.profile{
+	width: 14%;
+	height: 30px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+
+
+
+/* sidebar */
+
+@media only screen and (max-width:600px)
+{
+	.sidebar{
+		display: none;
+	width: 80% !important;
+	background: whitesmoke;
+	height: 100vh;
+	position: fixed;
+	padding-top: 20px;
+}
+.content{
+	margin-left: 0% !important;
+}
+}
+.sidebar{
+	width: 18%;
+	background-color: whitesmoke;
+	height: 100vh;
+	position: fixed;
+	padding-top: 45px;
+	z-index: 99999999999999999;
+	
+}
+.sidebar a{
+	display: block;
+	width: 100%;
+	padding: 10px 25px;
+	text-decoration: none;
+	color: gray;
+}
+.sidebar a:hover{
+	background-color:#e2e2e2 ;
+}
+.sidebar .divider{
+	height: 5px;
+	width: 100%;
+	background-color:#e2e2e2 ;
+}
+
+.content{
+	margin-left:20% ;
+	
+}
+
+.sidebar .crossBtn{
+	position: absolute;
+	top: 0;
+	right: 35px;
+	font-size: 36px;
+	cursor: pointer;
+}
+
+/* search css*/
+.search-container{
+	position: relative;
+}
+.search-result{
+	position: absolute;
+	background: white;
+	border: 1px solid gray;
+	width:100%;
+	padding: 10px;
+	display: none;
+}
+
+
+
+
+
+

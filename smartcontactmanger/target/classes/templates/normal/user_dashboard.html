@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="normal/base::Layout(~{::section})">
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>About Page</title>
+</head>
+<body>
+	<section>
+		<h1 class="text-center">Welcome to Home Page</h1>
+		<div class="card">
+			
+			<div class="card-body my-5">
+				<div class="container text-center">
+					<img src="https://www.terrainhopperusa.com/wp-content/uploads/2019/01/avatar-man.png" alt="none" class="rounded-full" style="width: 200px;" />
+				</div>
+			
+				<h1 class="text-center  text-secondary font-italic font-weight-light">Start adding your contact......</p>
+		
+			<a th:href="@{/user/add-contact}" class="btn btn-primary btn-block" >Add Contact</a>
+		</div>
+		</div>
+	</section>
+</body>
+</html>

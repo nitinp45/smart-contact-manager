@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="normal/base::Layout(~{::section})">
+   <head>
+      <meta charset="UTF-8" />
+      <title>About Page</title>
+   </head>
+   <body>
+      <section>
+         <div class="card mr-3 ml-3">
+            <div class="card-body ml-5 text-center ">
+               <h3>
+                  <span th:text="${user.name}"></span>
+               </h3>
+               <table class="table">
+                  <tbody>
+                     <tr>
+                        <th scope="row">#User ID:</th>
+                        <td th:text="${user.id}"></td>
+                     </tr>
+                     <tr>
+                        <th scope="row">Email:</th>
+                        <td><span th:text="${user.email}"></span></td>
+                     </tr>
+                     <tr>
+                        <th scope="row">Role:</th>
+                        <td><span th:text="${user.role}"></span></td>
+                     </tr>
+                     <tr>
+                        <th scope="row">Account Active:</th>
+                        <td th:text="${user.enabled}"></td>
+                     </tr>
+                     <tr>
+                        <th scope="row">About:</th>
+                        <td th:text="${user.about}"></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </section>
+   </body>
+</html>
