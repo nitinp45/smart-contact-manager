@@ -25,14 +25,13 @@ public class User {
 		@GeneratedValue(strategy=GenerationType.AUTO)
 		private int id;
 		
-		
 		@NotBlank(message="Name field is required!")
 		@Size(min = 2, max = 10, message = "length shoud be in between 2 to 10")
 		private String name;
 		
 
 		@NotEmpty(message = "Email field should not be empty")
-		@Email(regexp = "^(.+)@(.+)$", message = "Invalid email pattern")
+		@Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}")
 		private String email;
 		private String role;
 		private String password;

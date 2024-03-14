@@ -1,8 +1,9 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="Layout(content)">
    <head>
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>Insert title here</title>
+      <title>smart contact manager</title>
+      <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
       <link rel="stylesheet"
          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
       <script
@@ -43,20 +44,24 @@
          <a th:href="@{/user/show-contact/0}" class="item"><i class="fa-solid fa-address-book"></i>View Contacts</a>
          <a th:href="@{/user/add-contact}" class="item"><i class="fa-solid fa-pencil"></i>Add Contact</a>
          <a th:href="@{/user/profile}" class="item"><i class="fa-solid fa-user"></i>Your profile</a>
-         <a href="#" class="item"><i class="fa-solid fa-gear"></i>Setting</a>
+         <a th:href="@{/user/setting}" class="item"><i class="fa-solid fa-gear"></i>Setting</a>
          <a th:href="@{/logout}" class="item"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
          <div class="divider"></div>
       </div>
       <div class="content mt-5">
          <i onclick="toggleSidebar()" class="fas fa-bars m-3"></i>
          <div th:if="${session.message}" class="container">
-            <div th:classappend="${'alert-'+session.message.type}" class="alert alert-success text-center" role="alert">
+            <div th:classappend="${'alert-'+session.message.type}" class="alert alert-success alert-dismissible fade show" role="alert">
                <span th:text="${session.message.content}"></span>
+               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
             </div>
          </div>
          <div th:replace="${content}"></div>
       </div>
-      <!-- Place this at the end of the body or just before the closing body tag -->
+      <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script type="text/javascript" th:src="@{/js/script.js}"></script>
    </body>
 </html>

@@ -41,12 +41,12 @@
                                 </a>
                             </td>
                             <td th:text="${c.phone}"></td>
-                            <td>
-                                <a class="btn btn-danger" th:href="@{'/user/delete/'+${c.cid}}">Delete</a>
-                                <form th:action="@{'/user/update/'+${c.cid}}" class="mt-2" method="post">
-                                    <a class="btn btn-success" type="submit">Update</a>
-                                </form>
-                            </td>
+                            <td class="d-flex">
+							    	<a th:href="@{'/user/delete/'+${c.cid}}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+							    <form th:action="@{'/user/update/'+${c.cid}}" method="post" class="pl-2">
+							        <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-pencil"></i></button>
+							    </form>
+							</td>
                         </tr>
                     </tbody>
                 </table>

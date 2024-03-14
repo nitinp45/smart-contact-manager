@@ -13,18 +13,13 @@
     <div class="container shadow-lg mt-3 p-3">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div th:if="${session.message != null}" th:classappend="${session.message.type}" class="alert alert-primary" role="alert">
-                    <p th:text="${session.message.content}"></p>
-                    <div th:text="${@sessionutilitybean.removeMessageFromSession()}"></div>
-                </div>
-
                 <div class="container text-center">
                     <img class="img-fluid" style="max-width: 50px;" th:src="@{/img/signup.png}">
                 </div>
                 <h3 class="text-center p-4">Registration form</h3>
-                <form novalidate th:action="@{/do-register}" method="POST" th:object="${user}">
+                <form novalidate th:action="@{/do-register}" method="POST" th:object="${user}" >
                     <div class="form-group mt-3">
-                        <label for="exampleInputname">Full Name</label>
+                        <label for="exampleInputName">Full Name</label>
                         <input type="text" class="form-control" id="name_field" placeholder="Full name" name="name" th:classappend="${#fields.hasErrors('name') ? 'is-invalid' : ''}"
                                required th:value="${user.name}">
                         <div class="invalid-feedback" th:each="error:${#fields.errors('name')}" th:text="${error.message}">
@@ -43,18 +38,11 @@
                                name="password" required>
                     </div>
                     <div class="form-group mt-3">
-                        <textarea name="about" placeholder="Enter something about yourself" rows="5" class="form-control" th?:value="${user.about}"></textarea>
+                        <textarea name="about" placeholder="Enter something about yourself" rows="5" class="form-control" id="desc_field" th:value="${user.about}"></textarea>
                     </div>
-                    <div class="form-group form-check text-center">
-                        <input type="checkbox"
-                               name="agreement"
-                               class="form-check-input"
-                               id="agreement"
-                        />
-                        <label for="agreement">Accept terms and conditions</label>
-                    </div>
+                  
                     <div class="container text-center">
-                        <button type="submit" class="btn bg-primary text-white">
+                        <button class="btn btn-success" onclick="registerUser()">
                             Submit
                         </button>
                         <button type="reset" class="btn bg-warning">

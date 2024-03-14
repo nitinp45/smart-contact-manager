@@ -6,29 +6,39 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
-
+import java.util.Map;
 import java.util.Optional;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.smart.dao.ContactRepository;
+import com.smart.dao.PaymentRepository;
 import com.smart.dao.UserRepository;
 import com.smart.entities.Contact;
+import com.smart.entities.MyOrder;
 import com.smart.entities.User;
 import com.smart.helper.Message;
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+import com.razorpay.RazorpayException;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -41,6 +51,12 @@ public class UserController {
 
     @Autowired
     private ContactRepository contactRepository;
+    
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @ModelAttribute
     public void addCommonData(Model model, Principal principal) {
@@ -104,8 +120,6 @@ public class UserController {
         return "normal/add_contact";
     }
 
-
-
     @GetMapping("/show-contact/{page}")
     public String showcontacts(Model m, Principal principal, @PathVariable("page") Integer page) {
         //contact ki list ko bhejni hai
@@ -139,7 +153,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/delete/{cid}")
     public String Delete(@PathVariable("cid") Integer cid, Model model, HttpSession session, Principal principal) {
 
@@ -152,60 +165,139 @@ public class UserController {
             this.contactRepository.delete(contact);
             session.setAttribute("message", new Message("Contact deleted succesfully...", "danger"));
         }
-
         return "redirect:/user/show-contact/0";
     }
 
-
-
-    //open updare form handler
+    //open update form handler
     @PostMapping("/update/{cid}")
     public String updateContact(@PathVariable("cid") Integer cid, Model m) {
         Optional < Contact > contactOptional = this.contactRepository.findById(cid);
-        Contact contact = contactOptional.get();
-        m.addAttribute("contact", contact);
-        return "normal/update_form";
+        if (contactOptional.isPresent()) {
+            Contact contact = contactOptional.get();
+            m.addAttribute("contact", contact);
+            return "normal/update_form";
+        } else {
+         
+            return "error_page";
+        }
     }
 
-    
     @PostMapping("/process-update")
     public String updateForm(@ModelAttribute("contact") Contact contact, @RequestParam("profileImage") MultipartFile file, Model model, HttpSession session, Principal principal) {
         try {
+            Optional<Contact> contactOptional = this.contactRepository.findById(contact.getCid());
+            if (contactOptional.isPresent()) {
+                Contact oldContactDetail = contactOptional.get();
 
-            Contact oldcontactDetail = this.contactRepository.findById(contact.getCid()).get();
-            if (!file.isEmpty()) {
+                if (!file.isEmpty()) {
+                    File saveFile = new ClassPathResource("static/img").getFile();
+                    Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    contact.setImage(file.getOriginalFilename());
+                } else {
+                    contact.setImage(oldContactDetail.getImage());
+                }
 
-                File savefile = new ClassPathResource("static/img").getFile();
+                User user = this.userRepository.getUserByUserName(principal.getName());
+                contact.setUser(user);
+                this.contactRepository.save(contact);
 
-                Path path = Paths.get(savefile.getAbsolutePath() + File.separator + file.getOriginalFilename());
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                contact.setImage(file.getOriginalFilename());
-
+                session.setAttribute("message", new Message("Update successful...", "success"));
             } else {
-                contact.setImage(oldcontactDetail.getImage());
+                // Handle the case where the contact with the given ID is not found
+                session.setAttribute("message", new Message("Contact not found. Update failed.", "danger"));
             }
-
-
-            User user = this.userRepository.getUserByUserName(principal.getName());
-            contact.setUser(user);
-            this.contactRepository.save(contact);
-            session.setAttribute("message", new Message("Update successful...", "success"));
         } catch (Exception e) {
             e.printStackTrace();
-
             session.setAttribute("message", new Message("Update failed. Please try again.", "danger"));
         }
-
-        System.out.println("Contact Id:" + contact.getCid());
-        System.out.println("Contact Name:" + contact.getName());
-
-        return "redirect:/user/contact/" + contact.getCid();
+        return "redirect:/user/show-contact/" + contact.getCid();
     }
 
-    
+
     @GetMapping("/profile")
     public String showProfile(Model m) {
         m.addAttribute("title", "profile");
         return "normal/profile";
     }
+    
+    
+    @GetMapping("/setting")
+    public String ChangePass()
+    {
+    	return "normal/setting";
+    }
+    
+    @PostMapping("/change-password")
+    public String changePasshandler(@RequestParam("oldPassword") String oldPassword,@RequestParam("newPassword") String newPassword,Principal pricipal,HttpSession session )
+    {
+    	
+    	System.out.println("OLD="+oldPassword);
+    	System.out.println("NEW="+newPassword);
+    	
+    	String userName=pricipal.getName();
+    	User currentUser=this.userRepository.getUserByUserName(userName);
+    	System.out.println(currentUser);
+    	
+    	if(this.bCryptPasswordEncoder.matches(oldPassword,currentUser.getPassword()))
+    	{
+    		currentUser.setPassword(this.bCryptPasswordEncoder.encode(newPassword));
+    		this.userRepository.save(currentUser);
+    		session.setAttribute("message", new Message("Password Successfully changed", "success"));
+    	}
+    	else {
+    		session.setAttribute("message", new Message("Wrong old password!", "danger"));
+    	}
+    	
+    	return "redirect:/user/index";
+    }
+    
+    
+    @PostMapping("/create-order")
+    @ResponseBody
+    public String create_order(@RequestBody Map<String,Object> data,Principal principal) throws Exception
+    {
+    	System.out.print(data);
+    	int amt=Integer.parseInt(data.get("amount").toString());   //data come in object format so its convertedd in string and after typecast in integer
+    	var client=new RazorpayClient("rzp_test_D9EJdca2UFW3p5","cYeJls1umBNT35CtTpbcoCjf");
+    	
+    	JSONObject ob=new JSONObject();
+    	ob.put("amount", amt*100);
+    	ob.put("currency", "INR");
+    	ob.put("receipt","txn_23846");
+    	
+    	
+    	
+    	//create a new order
+    	Order order=client.orders.create(ob);
+    	System.out.println(order);
+    	
+    	
+    	//save order details in database
+    	
+    	MyOrder myOrder=new MyOrder();
+    	myOrder.setAmount(order.get("amount")+"");
+    	myOrder.setOrderId(order.get("orderId"));
+    	myOrder.setPaymentId(null);
+    	myOrder.setReceipt(order.get("receipt"));
+    	myOrder.setUser(this.userRepository.getUserByUserName(principal.getName()));
+    	myOrder.setStatus("created");
+    	
+    	this.paymentRepository.save(myOrder);
+    	return order.toString();
+    }
+    
+    @PostMapping("/update_order")
+    public ResponseEntity<?> updatePayment(@RequestBody Map<String,Object> data)
+    {
+    	MyOrder myorder=this.paymentRepository.findByOrderId(data.get("order_id").toString());
+    	
+    	myorder.setPaymentId(data.get("payment_id").toString());
+    	myorder.setStatus(data.get("status").toString());
+    	
+    	this.paymentRepository.save(myorder);
+		return ResponseEntity.ok(Map.of("msg","updated"));
+    	
+    }
+       
 }

@@ -14,8 +14,8 @@
 }
 
 .profile{
-	width: 14%;
-	height: 30px;
+	width: 16%;
+	height: 50px;
 	object-fit: cover;
 	border-radius: 50%;
 }
@@ -27,8 +27,8 @@
 
 @media only screen and (max-width:600px)
 {
-	.sidebar{
-		display: none;
+.sidebar{
+	display: none;
 	width: 80% !important;
 	background: whitesmoke;
 	height: 100vh;
@@ -59,7 +59,7 @@
 	background-color:#e2e2e2 ;
 }
 .sidebar .divider{
-	height: 5px;
+	
 	width: 100%;
 	background-color:#e2e2e2 ;
 }

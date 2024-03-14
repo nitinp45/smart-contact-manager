@@ -8,15 +8,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.smart.dao.UserRepository;
 import com.smart.entities.User;
-import com.smart.helper.Message;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-
 
 @Controller
 public class HomeController {	
@@ -26,7 +21,6 @@ public class HomeController {
 	
 	@Autowired
 	private UserRepository userRepository;
-	
 	
 	@GetMapping("/home")
 	public String home()
@@ -43,53 +37,43 @@ public class HomeController {
 	@GetMapping("/login")
 	public String Login()
 	{
+		
 		return "login";
 	}
-	
-
 	@GetMapping("/register")
 	public String signup(Model model)
 	{
 		model.addAttribute("user",new User());
 		return "register";
-	
 	}
-	
+
 	@PostMapping("/do-register")
-	public String registeruser(@Valid @ModelAttribute("user") User user,BindingResult bindingresult,@RequestParam(value="agreement" ,defaultValue="false") boolean agreement,Model model,HttpSession session)
+	public String registeruser(@Valid @ModelAttribute("user") User user,BindingResult bindingresult,Model model)
 	{
 		try {
-			if(!agreement)
-			{
-				System.out.print("You are not agree terms and condition");
-				throw new Exception("You are not agree terms and condition");
-			}
-			
 			if(bindingresult.hasErrors())
 			{
 				model.addAttribute("user",user);
 				return "register";
-				
+
 			}
 			user.setRole("ROLE_USER");
 			user.setEnabled(true);
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
-			System.out.println("Aggrement="+agreement);
+			
 			System.out.println("user="+user);
-			
+
 			User result=this.userRepository.save(user);
-			
+
 			model.addAttribute("user",new User());
-			session.setAttribute("message",new Message("Succesfully Registered!!","alert-success"));
-			return "register";
+			return "redirect:/login";
 
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 			model.addAttribute("user",user);
-			session.setAttribute("message", new Message("something went wrong!!"+e.getMessage(),"alert-danger"));
 			return "register";
 		}
-			}
+	}
 }

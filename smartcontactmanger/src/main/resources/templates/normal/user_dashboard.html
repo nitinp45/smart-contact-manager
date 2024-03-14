@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="normal/base::Layout(~{::section})">
-
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>About Page</title>
@@ -15,9 +14,17 @@
 					<img src="https://www.terrainhopperusa.com/wp-content/uploads/2019/01/avatar-man.png" alt="none" class="rounded-full" style="width: 200px;" />
 				</div>
 			
-				<h1 class="text-center  text-secondary font-italic font-weight-light">Start adding your contact......</p>
+				<p class="text-center  text-secondary font-italic font-weight-light">Start adding your contact......</p>
 		
 			<a th:href="@{/user/add-contact}" class="btn btn-primary btn-block" >Add Contact</a>
+			</hr>
+			
+			 <div class="my-3">
+            <label for="exampleInputPassword1">Donate us</label>
+            <input type="text" class="form-control" id="payment" placeholder="Enter amount" name="payment"/>
+			</div>
+			<button onclick="paymentStart()" class="btn btn-success">Donate</button>
+        </div>
 		</div>
 		</div>
 	</section>
